@@ -1,15 +1,17 @@
 <?php
-define('DB_HOST', 'mysql');
-define('DB_NAME', 'mydb');
-define('DB_USER', 'appuser');
-define('DB_PASS', 'apppassword');
+define('DB_HOST', getenv('MYSQLHOST') ?: getenv('DB_HOST') ?: 'mysql');
+define('DB_NAME', getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: 'mydb');
+define('DB_USER', getenv('MYSQLUSER') ?: getenv('DB_USER') ?: 'appuser');
+define('DB_PASS', getenv('MYSQLPASSWORD') ?: getenv('DB_PASS') ?: 'apppassword');
+$dbPort = getenv('MYSQLPORT') ?: '3306';
 
 function getDb() {
     static $pdo = null;
     if ($pdo === null) {
         try {
+            $dsn = "mysql:host=" . DB_HOST . ";port=" . $dbPort . ";dbname=" . DB_NAME . ";charset=utf8mb4";
             $pdo = new PDO(
-                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+                $dsn,
                 DB_USER,
                 DB_PASS,
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
