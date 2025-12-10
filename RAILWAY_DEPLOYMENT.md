@@ -21,21 +21,19 @@ This application is configured for Railway deployment with dynamic PORT handling
 
 #### MySQL Service
 1. Add a new MySQL service in Railway
-2. Note the connection details (host, database, user, password)
+   - Click "+ New" → "Database" → "Add MySQL"
+2. **Connect MySQL to PHP Service** (CRITICAL):
+   - Go to your PHP service settings
+   - Click "Variables" tab
+   - Click "+ New Variable"
+   - Select "Reference Variable"
+   - Choose your MySQL service
+   - Railway will automatically inject: `MYSQLHOST`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`, `MYSQLPORT`
 
-### 2. Configure Environment Variables
-
-In your PHP service, set these environment variables:
-
-```
-PORT=80
-DB_HOST=<railway-mysql-host>
-DB_NAME=<railway-mysql-database>
-DB_USER=<railway-mysql-user>
-DB_PASS=<railway-mysql-password>
-```
-
-**Important**: Railway automatically sets `PORT`, but you can override it if needed.
+**Important**: 
+- Railway automatically sets `PORT` for your PHP service
+- Railway automatically provides MySQL connection variables when you reference the MySQL service
+- **You don't need to manually set DB_HOST, DB_NAME, etc.** - the app reads Railway's `MYSQL*` variables automatically
 
 ### 3. Update Database Configuration
 
@@ -128,10 +126,20 @@ curl https://your-app.railway.app/health.php
 
 ### Issue: Database Connection Failed
 
-**Solution**: Ensure MySQL service variables are set:
-- Railway automatically provides MySQL connection variables
-- Update `config.php` to use Railway's MySQL variables
-- Check service dependencies in Railway dashboard
+**Solution**: 
+1. **Verify MySQL service is connected to PHP service**:
+   - Go to PHP service → Variables tab
+   - Ensure MySQL service is listed as a "Reference Variable"
+   - If not, add it: "+ New Variable" → "Reference Variable" → Select MySQL service
+
+2. **Check environment variables are set**:
+   - Visit: `https://your-app.railway.app/debug_db.php`
+   - Verify `MYSQLHOST`, `MYSQLDATABASE`, etc. are shown (not "NOT SET")
+   - If variables are missing, reconnect MySQL service to PHP service
+
+3. **Verify MySQL service is running**:
+   - Check MySQL service status in Railway dashboard
+   - Ensure it shows "Active" status
 
 ### Issue: Health Check Failing
 

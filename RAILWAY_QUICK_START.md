@@ -27,23 +27,29 @@
 
 ### 2. Add MySQL Service
 - Click "+ New" → "Database" → "Add MySQL"
-- Railway will auto-generate connection variables
+- Railway will create the MySQL service
 
-### 3. Configure PHP Service
+### 3. Connect MySQL to PHP Service (CRITICAL!)
+- Go to your **PHP service** → Click "Variables" tab
+- Click "+ New Variable" → Select "Reference Variable"
+- Choose your **MySQL service** from the dropdown
+- Railway will automatically inject MySQL connection variables
+
+### 4. Configure PHP Service
 Railway will auto-detect the Dockerfile. Verify:
 - **Build Command**: (auto-detected)
 - **Start Command**: (auto-detected, uses entrypoint)
 - **Health Check Path**: `/health.php`
 - **Port**: Railway sets `PORT` automatically
 
-### 4. Environment Variables (Auto-set by Railway)
-Railway automatically provides:
-- `PORT` - Port to listen on
-- `MYSQLHOST` - MySQL host
-- `MYSQLDATABASE` - Database name
-- `MYSQLUSER` - Database user
-- `MYSQLPASSWORD` - Database password
-- `MYSQLPORT` - MySQL port
+### 5. Environment Variables (Auto-set by Railway)
+After connecting MySQL service, Railway automatically provides:
+- `PORT` - Port to listen on (set automatically)
+- `MYSQLHOST` - MySQL host (from MySQL service reference)
+- `MYSQLDATABASE` - Database name (from MySQL service reference)
+- `MYSQLUSER` - Database user (from MySQL service reference)
+- `MYSQLPASSWORD` - Database password (from MySQL service reference)
+- `MYSQLPORT` - MySQL port (from MySQL service reference)
 
 **No manual configuration needed!** The app reads these automatically.
 
@@ -72,9 +78,13 @@ curl -I https://your-app.railway.app/
 3. Test health endpoint: `/health.php`
 
 ### Database Connection Failed
-1. Verify MySQL service is running
-2. Check Railway provides `MYSQLHOST`, `MYSQLDATABASE`, etc.
-3. Check logs for connection errors
+1. **Verify MySQL service is connected to PHP service**:
+   - PHP service → Variables tab → Should see MySQL service listed
+   - If not, add it: "+ New Variable" → "Reference Variable" → Select MySQL
+2. **Check environment variables**:
+   - Visit: `https://your-app.railway.app/debug_db.php`
+   - Verify all `MYSQL*` variables are set (not "NOT SET")
+3. Verify MySQL service is running (should show "Active")
 
 ### Health Check Failing
 1. Increase startup timeout in Railway settings (60s recommended)
